@@ -9,10 +9,13 @@ import {
   X,
   RefreshCw,
   FileText,
+  ArrowLeft,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import QuizScore from "./score";
 import QuizReview from "./quiz-overview";
 import { Question } from "@/lib/schemas";
+import { useLearningStore } from "@/lib/store";
 
 type QuizProps = {
   questions: Question[];
@@ -45,10 +48,10 @@ const QuestionCard: React.FC<{
               showCorrectAnswer && answerLabels[index] === question.answer
                 ? "bg-green-600 hover:bg-green-700"
                 : showCorrectAnswer &&
-                    selectedAnswer === answerLabels[index] &&
-                    selectedAnswer !== question.answer
-                  ? "bg-red-600 hover:bg-red-700"
-                  : ""
+                  selectedAnswer === answerLabels[index] &&
+                  selectedAnswer !== question.answer
+                ? "bg-red-600 hover:bg-red-700"
+                : ""
             }`}
             onClick={() => onSelectAnswer(answerLabels[index])}
           >
@@ -77,20 +80,25 @@ export default function Quiz({
   clearPDF,
   title = "Quiz",
 }: QuizProps) {
+  const router = useRouter();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<string[]>(
-    Array(questions.length).fill(null),
+  const [answers, setAnswers] = useState<string[]>(() =>
+    questions ? Array(questions.length).fill(null) : []
   );
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [progress, setProgress] = useState(0);
+  const updateScore = useLearningStore((state) => state.updateScore);
+  const updateProgress = useLearningStore((state) => state.updateProgress);
 
   useEffect(() => {
+    if (!questions) return;
+
     const timer = setTimeout(() => {
       setProgress((currentQuestionIndex / questions.length) * 100);
     }, 100);
     return () => clearTimeout(timer);
-  }, [currentQuestionIndex, questions.length]);
+  }, [currentQuestionIndex, questions]);
 
   const handleSelectAnswer = (answer: string) => {
     if (!isSubmitted) {
@@ -119,7 +127,10 @@ export default function Quiz({
     const correctAnswers = questions.reduce((acc, question, index) => {
       return acc + (question.answer === answers[index] ? 1 : 0);
     }, 0);
-    setScore(correctAnswers);
+    const score = Math.round((correctAnswers / questions.length) * 100);
+    setScore(score);
+    updateScore("quiz", score);
+    updateProgress("quiz", 100);
   };
 
   const handleReset = () => {
@@ -130,14 +141,47 @@ export default function Quiz({
     setProgress(0);
   };
 
+  if (!questions || questions.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-4">No questions available</h2>
+          <Button onClick={clearPDF}>Try Another PDF</Button>
+        </div>
+      </div>
+    );
+  }
+
   const currentQuestion = questions[currentQuestionIndex];
+
+  if (!currentQuestion) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-4">Error loading question</h2>
+          <Button onClick={handleReset}>Reset Quiz</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <main className="container mx-auto px-4 py-12 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-8 text-center text-foreground">
-          {title}
-        </h1>
+        <div className="flex items-center mb-8">
+          <Button
+            onClick={() => router.push("/learn")}
+            variant="ghost"
+            className="mr-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Modes
+          </Button>
+          <h1 className="text-3xl font-bold text-center text-foreground flex-1">
+            {title}
+          </h1>
+          <div className="w-[100px]" /> {/* For centering the title */}
+        </div>
         <div className="relative">
           {!isSubmitted && <Progress value={progress} className="h-1 mb-8" />}
           <div className="min-h-[400px]">
@@ -192,7 +236,7 @@ export default function Quiz({
                     <div className="space-y-12">
                       <QuizReview questions={questions} userAnswers={answers} />
                     </div>
-                    <div className="flex justify-center space-x-4 pt-4">
+                    {/* <div className="flex justify-center space-x-4 pt-4">
                       <Button
                         onClick={handleReset}
                         variant="outline"
@@ -206,13 +250,26 @@ export default function Quiz({
                       >
                         <FileText className="mr-2 h-4 w-4" /> Try Another PDF
                       </Button>
-                    </div>
+                    </div> */}
                   </div>
                 )}
               </motion.div>
             </AnimatePresence>
           </div>
         </div>
+        {isSubmitted && (
+          <div className="flex justify-center space-x-4 mt-8">
+            <Button onClick={handleReset} variant="outline">
+              <RefreshCw className="mr-2 h-4 w-4" /> Reset Quiz
+            </Button>
+            <Button onClick={clearPDF}>
+              <FileText className="mr-2 h-4 w-4" /> Try Another PDF
+            </Button>
+            <Button onClick={() => router.push("/learn")}>
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Modes
+            </Button>
+          </div>
+        )}
       </main>
     </div>
   );
