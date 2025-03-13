@@ -22,6 +22,22 @@ interface TestProps {
 }
 
 export default function Test({ questions, clearPDF }: TestProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<(string | boolean)[]>(() =>
+    questions ? Array(questions.length).fill(null) : []
+  );
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [score, setScore] = useState<number>(0);
+  const updateScore = useLearningStore((state) => state.updateScore);
+  const updateProgress = useLearningStore((state) => state.updateProgress);
+
+  const handleReset = () => {
+    setCurrentIndex(0);
+    setAnswers(questions ? Array(questions.length).fill(null) : []);
+    setIsSubmitted(false);
+    setScore(0);
+  };
+
   if (!questions || questions.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -34,22 +50,6 @@ export default function Test({ questions, clearPDF }: TestProps) {
       </div>
     );
   }
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<(string | boolean)[]>(() =>
-    Array(questions.length).fill(null)
-  );
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [score, setScore] = useState<number>(0);
-  const updateScore = useLearningStore((state) => state.updateScore);
-  const updateProgress = useLearningStore((state) => state.updateProgress);
-
-  const handleReset = () => {
-    setCurrentIndex(0);
-    setAnswers(Array(questions.length).fill(null));
-    setIsSubmitted(false);
-    setScore(0);
-  };
 
   const currentQuestion = questions[currentIndex];
   if (!currentQuestion) {

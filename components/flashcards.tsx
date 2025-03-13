@@ -168,7 +168,7 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
 
         <div className="text-center mb-8">
           <p className="text-muted-foreground">
-            Swipe right if you know it, left if you don't • {completed.length}/
+            Swipe right if you know it, left if you do not • {completed.length}/
             {cards.length} reviewed
           </p>
         </div>
