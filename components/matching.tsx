@@ -135,9 +135,9 @@ export default function Matching({ pairs, clearPDF }: MatchingProps) {
                   className={`p-4 h-32 flex items-center justify-center text-center cursor-pointer transition-colors
                     ${
                       matchedPairs.includes(card.id)
-                        ? "bg-green-100 dark:bg-green-900"
+                        ? "bg-green-100 "
                         : selectedCard === card.id
-                        ? "bg-blue-100 dark:bg-blue-900"
+                        ? "bg-blue-100 "
                         : ""
                     }`}
                   onClick={() => handleCardClick(card.id)}

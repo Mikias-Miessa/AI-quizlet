@@ -99,28 +99,24 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
 
   if (isFinished) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-black p-8">
+      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50  p-8">
         <div className="max-w-2xl mx-auto">
           <div className="text-center space-y-8">
-            <h2 className="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+            <h2 className="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 ">
               Flashcards Complete!
             </h2>
             <div className="grid grid-cols-2 gap-8 mb-8">
-              <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-0">
-                <div className="text-4xl font-bold text-green-600 dark:text-green-400 mb-2">
+              <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100  border-0">
+                <div className="text-4xl font-bold text-green-600  mb-2">
                   {rightSwipes}
                 </div>
-                <div className="text-sm text-green-700 dark:text-green-300">
-                  Cards you knew
-                </div>
+                <div className="text-sm text-green-700 ">Cards you knew</div>
               </Card>
-              <Card className="p-6 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border-0">
-                <div className="text-4xl font-bold text-red-600 dark:text-red-400 mb-2">
+              <Card className="p-6 bg-gradient-to-br from-red-50 to-red-100  border-0">
+                <div className="text-4xl font-bold text-red-600  mb-2">
                   {leftSwipes}
                 </div>
-                <div className="text-sm text-red-700 dark:text-red-300">
-                  Cards to review
-                </div>
+                <div className="text-sm text-red-700 ">Cards to review</div>
               </Card>
             </div>
             <div className="mb-8">
