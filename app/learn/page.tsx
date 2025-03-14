@@ -86,7 +86,7 @@ export default function LearnPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-black">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-16">
         {/* Header Section with New PDF Button */}
         <div className="text-center mb-16 relative">
