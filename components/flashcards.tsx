@@ -26,6 +26,7 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
   const [rightSwipes, setRightSwipes] = useState(0);
   const [leftSwipes, setLeftSwipes] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [finalScore, setFinalScore] = useState(0);
   const updateProgress = useLearningStore((state) => state.updateProgress);
   const updateScore = useLearningStore((state) => state.updateScore);
 
@@ -56,7 +57,16 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
 
     if (offset > 100 || velocity > 800) {
       // Dragged right - Correct
-      setRightSwipes((prev) => prev + 1);
+      setRightSwipes((prev) => {
+        const newRightSwipes = prev + 1;
+        // If this is the last card, calculate and set the final score
+        if (currentIndex === cards.length - 1) {
+          const score = newRightSwipes * 10;
+          setFinalScore(score);
+          updateScore("flashcards", score);
+        }
+        return newRightSwipes;
+      });
       handleNext();
       updateProgress(
         "flashcards",
@@ -74,9 +84,6 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
       setCurrentIndex(currentIndex + 1);
       setIsFlipped(false);
     } else {
-      const finalScore = Math.round((rightSwipes / cards.length) * 100);
-      console.log(finalScore);
-      updateScore("flashcards", finalScore);
       setIsFinished(true);
     }
   };
@@ -95,6 +102,7 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
     setRightSwipes(0);
     setLeftSwipes(0);
     setIsFinished(false);
+    setFinalScore(0);
   };
 
   if (isFinished) {
@@ -121,12 +129,9 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
             </div>
             <div className="mb-8">
               <div className="text-2xl font-semibold mb-2">
-                Final Score: {Math.round((rightSwipes / cards.length) * 100)}%
+                Final Score: {finalScore}%
               </div>
-              <Progress
-                value={Math.round((rightSwipes / cards.length) * 100)}
-                className="h-2 w-64 mx-auto"
-              />
+              <Progress value={finalScore} className="h-2 w-64 mx-auto" />
             </div>
             <div className="flex justify-center space-x-4">
               <Button
