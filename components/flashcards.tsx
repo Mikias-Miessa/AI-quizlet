@@ -8,13 +8,7 @@ import {
   useMotionValue,
   useTransform,
 } from "framer-motion";
-import {
-  ChevronLeft,
-  ChevronRight,
-  RotateCcw,
-  FileText,
-  ArrowLeft,
-} from "lucide-react";
+import { RotateCcw, FileText, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLearningStore } from "@/lib/store";
 import { Progress } from "@/components/ui/progress";
@@ -43,10 +37,17 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
     x,
     [-200, 0, 200],
     [
-      "rgba(239, 68, 68, 0.1)",
+      "rgba(239, 68, 68, 0.2)", // Red background for incorrect
       "rgba(255, 255, 255, 0)",
-      "rgba(34, 197, 94, 0.1)",
+      "rgba(34, 197, 94, 0.2)", // Green background for correct
     ]
+  );
+
+  // Scale effect based on drag
+  const scale = useTransform(
+    x,
+    [-200, -150, 0, 150, 200],
+    [0.8, 0.9, 1, 0.9, 0.8]
   );
 
   const handleDragEnd = (event: any, info: any) => {
@@ -73,17 +74,10 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
       setCurrentIndex(currentIndex + 1);
       setIsFlipped(false);
     } else {
-      // Calculate and save final score
       const finalScore = Math.round((rightSwipes / cards.length) * 100);
+      console.log(finalScore);
       updateScore("flashcards", finalScore);
       setIsFinished(true);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      setIsFlipped(false);
     }
   };
 
@@ -105,12 +99,14 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
 
   if (isFinished) {
     return (
-      <div className="min-h-screen bg-background p-8">
+      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-black p-8">
         <div className="max-w-2xl mx-auto">
           <div className="text-center space-y-8">
-            <h2 className="text-3xl font-bold mb-6">Flashcards Complete!</h2>
+            <h2 className="text-3xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+              Flashcards Complete!
+            </h2>
             <div className="grid grid-cols-2 gap-8 mb-8">
-              <Card className="p-6 bg-green-50 dark:bg-green-900/20">
+              <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-0">
                 <div className="text-4xl font-bold text-green-600 dark:text-green-400 mb-2">
                   {rightSwipes}
                 </div>
@@ -118,7 +114,7 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
                   Cards you knew
                 </div>
               </Card>
-              <Card className="p-6 bg-red-50 dark:bg-red-900/20">
+              <Card className="p-6 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border-0">
                 <div className="text-4xl font-bold text-red-600 dark:text-red-400 mb-2">
                   {leftSwipes}
                 </div>
@@ -137,10 +133,17 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
               />
             </div>
             <div className="flex justify-center space-x-4">
-              <Button onClick={handleReset} variant="outline">
+              <Button
+                onClick={handleReset}
+                variant="outline"
+                className="hover:scale-105 transition-transform"
+              >
                 <RotateCcw className="mr-2 h-4 w-4" /> Try Again
               </Button>
-              <Button onClick={() => router.push("/learn")}>
+              <Button
+                onClick={() => router.push("/learn")}
+                className="hover:scale-105 transition-transform"
+              >
                 <ArrowLeft className="mr-2 h-4 w-4" /> Back to Modes
               </Button>
             </div>
@@ -151,25 +154,27 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
   }
 
   return (
-    <div className="min-h-screen bg-background p-8">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-black p-8">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center mb-8">
           <Button
             onClick={() => router.push("/learn")}
             variant="ghost"
-            className="mr-4"
+            className="mr-4 hover:scale-105 transition-transform"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Modes
           </Button>
-          <h1 className="text-2xl font-bold flex-1 text-center">Flashcards</h1>
+          <h1 className="text-2xl font-bold flex-1 text-center bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+            Flashcards
+          </h1>
           <div className="w-[100px]" />
         </div>
 
         <div className="text-center mb-8">
           <p className="text-muted-foreground">
-            Swipe right if you know it, left if you do not • {completed.length}/
-            {cards.length} reviewed
+            Swipe right if you know it, left if you need to review •{" "}
+            {completed.length}/{cards.length} reviewed
           </p>
         </div>
 
@@ -177,11 +182,12 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
-              style={{ x, rotate, opacity }}
+              style={{ x, rotate, opacity, scale }}
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
               onDragEnd={handleDragEnd}
               className="absolute w-full"
+              whileDrag={{ cursor: "grabbing" }}
             >
               <motion.div
                 animate={{ rotateY: isFlipped ? 180 : 0 }}
@@ -190,7 +196,7 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
                 className="preserve-3d w-full relative"
               >
                 <Card
-                  className="p-8 cursor-pointer w-full min-h-[400px] flex items-center justify-center text-center absolute backface-hidden"
+                  className="p-8 cursor-pointer w-full min-h-[400px] flex items-center justify-center text-center absolute backface-hidden bg-white/80 backdrop-blur-sm border-0 shadow-lg"
                   onClick={handleCardClick}
                 >
                   <div className="text-xl font-medium">
@@ -198,7 +204,7 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
                   </div>
                 </Card>
                 <Card
-                  className="p-8 cursor-pointer w-full min-h-[400px] flex items-center justify-center text-center absolute backface-hidden"
+                  className="p-8 cursor-pointer w-full min-h-[400px] flex items-center justify-center text-center absolute backface-hidden bg-white/80 backdrop-blur-sm border-0 shadow-lg"
                   onClick={handleCardClick}
                   style={{ transform: "rotateY(180deg)" }}
                 >
@@ -211,26 +217,18 @@ export default function Flashcards({ cards, clearPDF }: FlashcardsProps) {
           </AnimatePresence>
         </div>
 
-        <div className="flex justify-between items-center">
-          <Button onClick={handlePrevious} disabled={currentIndex === 0}>
-            <ChevronLeft className="mr-2 h-4 w-4" /> Previous
-          </Button>
-          <span className="text-sm font-medium">
-            {currentIndex + 1} / {cards.length}
-          </span>
-          <Button
-            onClick={handleNext}
-            disabled={currentIndex === cards.length - 1}
-          >
-            Next <ChevronRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
-
         <div className="flex justify-center space-x-4 mt-8">
-          <Button onClick={handleReset} variant="outline">
+          <Button
+            onClick={handleReset}
+            variant="outline"
+            className="hover:scale-105 transition-transform"
+          >
             <RotateCcw className="mr-2 h-4 w-4" /> Reset
           </Button>
-          <Button onClick={clearPDF}>
+          <Button
+            onClick={clearPDF}
+            className="hover:scale-105 transition-transform"
+          >
             <FileText className="mr-2 h-4 w-4" /> Try Another PDF
           </Button>
         </div>

@@ -4,7 +4,6 @@ import { useParams, useRouter } from "next/navigation";
 import Quiz from "@/components/quiz";
 import Flashcards from "@/components/flashcards";
 import Matching from "@/components/matching";
-import Test from "@/components/test";
 import { toast } from "sonner";
 import { useLearningStore } from "@/lib/store";
 import { Button } from "@/components/ui/button";
@@ -83,8 +82,6 @@ export default function LearningModePage() {
       return (
         <Matching pairs={content?.pairs || []} clearPDF={handleClearPDF} />
       );
-    case "test":
-      return <Test questions={content} clearPDF={handleClearPDF} />;
     default:
       return null;
   }

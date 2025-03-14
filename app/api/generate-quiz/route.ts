@@ -1,10 +1,4 @@
-import {
-  questionSchema,
-  questionsSchema,
-  flashcardSchema,
-  matchingSchema,
-  testQuestionSchema,
-} from "@/lib/schemas";
+import { questionSchema, flashcardSchema, matchingSchema } from "@/lib/schemas";
 import { google } from "@ai-sdk/google";
 import { streamObject } from "ai";
 import { z } from "zod";
@@ -12,12 +6,8 @@ import { z } from "zod";
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-  const { files, type, testType } = await req.json();
+  const { files, type } = await req.json();
   const firstFile = files[0].data;
-
-  console.log("\n🚀 Starting content generation:");
-  console.log("📊 Type:", type);
-  console.log("📝 Test type:", testType || "N/A");
 
   let systemPrompt = "";
   let schema;
@@ -30,17 +20,13 @@ export async function POST(req: Request) {
       break;
     case "flashcards":
       systemPrompt =
-        "Create flashcards with key terms and their definitions from the document...";
+        "Create 10 flashcards with key terms and their definitions from the document...";
       schema = flashcardSchema;
       break;
     case "matching":
       systemPrompt =
-        "Create matching pairs of related concepts from the document...";
+        "Create matching pairs (8 pairs) of related concepts from the document...";
       schema = matchingSchema;
-      break;
-    case "test":
-      systemPrompt = `Create a test with ${testType} questions based on the document...`;
-      schema = testQuestionSchema;
       break;
   }
 
@@ -62,19 +48,15 @@ export async function POST(req: Request) {
         z.array(questionSchema),
         z.array(flashcardSchema),
         matchingSchema,
-        z.array(testQuestionSchema),
       ]),
       onFinish: ({ object }) => {
         if (!object) throw new Error("No response generated");
         generatedContent = object;
-        console.log("\n✅ Generated content:");
-        console.log(JSON.stringify(object, null, 2));
       },
     });
 
     return result.toTextStreamResponse();
   } catch (error) {
-    console.error("\n❌ Error generating content:", error);
     throw error;
   }
 }

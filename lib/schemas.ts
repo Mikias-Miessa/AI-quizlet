@@ -35,29 +35,8 @@ export const matchingSchema = z.object({
     .min(4),
 });
 
-export const testQuestionSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("multiple_choice"),
-    question: z.string(),
-    options: z.array(z.string()).length(4),
-    answer: z.enum(["A", "B", "C", "D"]),
-  }),
-  z.object({
-    type: z.literal("true_false"),
-    question: z.string(),
-    answer: z.boolean(),
-  }),
-  z.object({
-    type: z.literal("short_answer"),
-    question: z.string(),
-    answer: z.string(),
-    acceptableAnswers: z.array(z.string()).optional(),
-  }),
-]);
-
 export type FlashCard = z.infer<typeof flashcardSchema>;
 export type MatchingPairs = z.infer<typeof matchingSchema>;
-export type TestQuestion = z.infer<typeof testQuestionSchema>;
 
 export const learningMaterialSchema = z.discriminatedUnion("type", [
   z.object({
@@ -71,9 +50,5 @@ export const learningMaterialSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("matching"),
     sets: z.array(matchingSchema).min(1),
-  }),
-  z.object({
-    type: z.literal("test"),
-    questions: z.array(testQuestionSchema).min(4),
   }),
 ]);
