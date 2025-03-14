@@ -94,20 +94,20 @@ export default function LearnPage() {
             <Button
               onClick={handleNewPDF}
               variant="outline"
-              className="flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="flex items-center gap-2 hover:bg-gray-100  transition-colors"
             >
               <FileText className="h-4 w-4" />
               <span>Choose Another PDF</span>
             </Button>
           </div>
-          <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+          <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 ">
             Your Learning Dashboard
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mb-2">
+          <p className="text-lg text-gray-600 mb-2">
             Currently studying: <span className="font-medium">{fileName}</span>
           </p>
           <div className="max-w-xl mx-auto">
-            <p className="text-sm text-gray-500 dark:text-gray-500">
+            <p className="text-sm text-gray-500">
               Choose from our AI-powered learning modes to maximize your
               understanding
             </p>
@@ -134,12 +134,10 @@ export default function LearnPage() {
                 </div>
 
                 {/* Mode Title & Description */}
-                <h2 className="text-2xl font-semibold mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <h2 className="text-2xl font-semibold mb-3 group-hover:text-blue-600  transition-colors">
                   {mode.title}
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">
-                  {mode.description}
-                </p>
+                <p className="text-gray-600 mb-6">{mode.description}</p>
 
                 {/* Benefits List */}
                 <ul className="space-y-2 mb-6">
@@ -156,10 +154,10 @@ export default function LearnPage() {
 
                 {/* Progress Section */}
                 {learningProgress[mode.id]?.lastScore !== undefined && (
-                  <div className="space-y-2 pt-4 border-t border-gray-100 dark:border-gray-800">
+                  <div className="space-y-2 pt-4 border-t border-gray-100 ">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">Last Attempt</span>
-                      <span className="font-medium text-gray-700 dark:text-gray-300">
+                      <span className="font-medium text-gray-700 ">
                         {mode.id === "matching"
                           ? formatTime(learningProgress[mode.id].lastScore ?? 0)
                           : `${learningProgress[mode.id].lastScore}%`}
@@ -185,10 +183,10 @@ export default function LearnPage() {
 
         {/* Tips Section */}
         <div className="text-center">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">
+          <h3 className="text-xl font-semibold mb-4 text-gray-800 ">
             Learning Tips
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-gray-600 max-w-2xl mx-auto">
             For best results, we recommend starting with the Quiz mode to assess
             your knowledge, then using Flashcards for memorization, and finally
             Concept Matching to reinforce connections between ideas.
